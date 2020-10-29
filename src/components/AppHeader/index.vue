@@ -19,7 +19,6 @@
 
 <script>
 import { logout } from '@/api/login'
-import message from '../../../../../green/wwwroot/uni-app/components/uni-popup/message'
 export default {
   methods: {
     handleCommand (command) {

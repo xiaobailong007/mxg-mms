@@ -40,6 +40,7 @@ export default {
         })
     },
 
+    //删除操作
     deleteById(id) {
         return request({
             url: `/supplier/${id}`,

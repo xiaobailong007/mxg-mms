@@ -265,6 +265,8 @@ export default {
         }
       });
     },
+
+    //删除
     handleDelete(id) {
       console.log("删除", id);
       this.$confirm("确定删除这条记录？", "提示", {
