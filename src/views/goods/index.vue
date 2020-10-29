@@ -1,5 +1,43 @@
 <template>
   <div>
+    <!-- 行内表单 -->
+    <el-form
+      ref="searchForm"
+      :inline="true"
+      :model="searchMap"
+      style="margin-top:20px"
+    >
+      <el-form-item prop="name">
+        <el-input
+          v-model="searchMap.name"
+          placeholder="商品名称"
+          style="width:200px"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item prop="code">
+        <el-input
+          v-model="searchMap.code"
+          placeholder="商品编号"
+          style="width:200px"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item prop="supplierName">
+        <el-input readonly
+          v-model="searchMap.supplierName"
+          placeholder="选择供应商"
+          style="width:200px"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="fetchData">查询</el-button>
+        <!-- <el-button type="primary" @click="handleAdd">新增</el-button>
+        <el-button @click="resetForm('searchForm')">重置</el-button> -->
+      </el-form-item>
+    </el-form>
+
     <!-- 数据列表 -->
     <el-table :data="list" height="380" border style="width: 100%">
       <!-- type="index"获取索引值-->
@@ -35,12 +73,20 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     ></el-pagination>
+
+    <!-- 选择供应商对话框 -->
+<el-dialog title="选择供应商" :visible.sync="dialogSupplierVisible" width="500px">
+<supplier></supplier>
+<el-dialog>
   </div>
 </template>
 
 <script>
 import goodsApi from "@/api/goods.js";
+import Supplier from "@/views/supplier";
 export default {
+  //注册Supplier作为子组件
+  comments: { Supplier },
   data() {
     return {
       list: [],
@@ -62,13 +108,18 @@ export default {
         .then(response => {
           const data = response.data.data;
           this.list = data.rows;
-          console.log(this.list);
+          this.total = data.total;
+          //console.log(this.list);
         });
     },
-    handleSizeChange(){
-
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.fetchData();
     },
-    handleCurrentChange
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.fetchData();
+    }
   }
 };
 </script>
