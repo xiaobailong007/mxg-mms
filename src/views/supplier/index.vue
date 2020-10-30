@@ -15,7 +15,7 @@
         ></el-input>
       </el-form-item>
 
-      <el-form-item prop="linkman">
+      <el-form-item prop="linkman" v-if="!isDialog">
         <el-input
           v-model="searchMap.linkman"
           placeholder="联系人"
@@ -23,7 +23,7 @@
         ></el-input>
       </el-form-item>
 
-      <el-form-item prop="mobile">
+      <el-form-item prop="mobile" v-if="!isDialog">
         <el-input
           v-model="searchMap.mobile"
           placeholder="联系电话"
@@ -33,8 +33,8 @@
 
       <el-form-item>
         <el-button type="primary" @click="fetchData">查询</el-button>
-        <el-button type="primary" @click="handleAdd">新增</el-button>
-        <el-button @click="resetForm('searchForm')">重置</el-button>
+        <el-button type="primary" @click="handleAdd" v-if="!isDialog">新增</el-button>
+        <el-button @click="resetForm('searchForm')" v-if="!isDialog">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -48,9 +48,9 @@
         label="联系人"
         width="90"
       ></el-table-column>
-      <el-table-column prop="mobile" label="联系电话"></el-table-column>
-      <el-table-column prop="remark" label="备注"></el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column v-if="!isDialog" prop="mobile" label="联系电话" ></el-table-column>
+      <el-table-column v-if="!isDialog" prop="remark" label="备注"></el-table-column>
+      <el-table-column v-if="!isDialog" label="操作" width="150">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row.id)"
             >编辑</el-button
@@ -67,12 +67,13 @@
 
     <!-- 分页组件 -->
     <el-pagination
+      :layout="!isDialog?'total, sizes, prev, pager, next, jumper':'prev, pager, next'"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
       :page-sizes="[10, 20, 50]"
       :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
+
       :total="total"
     ></el-pagination>
 
@@ -123,6 +124,11 @@
 <script>
 import supplierApi from "@/api/supplier";
 export default {
+  props: {
+    //接受父组件传递过来得数据,通过isDialog来判断是否为弹框
+    //如果为true，则是弹框，false就是列表
+    isDialog:Boolean
+  },
   data() {
     return {
       list: [],
@@ -132,7 +138,7 @@ export default {
       searchMap: {
         name: "",
         linkman: "",
-        mobile: "",
+        mobile: ""
       }, //条件查询得绑定字段值
       dialogFormVisible: false,
       pojo: {
@@ -140,7 +146,7 @@ export default {
         name: "",
         linkman: "",
         mobile: "",
-        remark: "",
+        remark: ""
       },
       rules: {
         //校验规则
@@ -148,18 +154,18 @@ export default {
           {
             required: true,
             message: "供应商不能为空",
-            trigger: "blur",
-          },
+            trigger: "blur"
+          }
         ],
 
         linkman: [
           {
             required: true,
             message: "联系人不能为空",
-            trigger: "blur",
-          },
-        ],
-      },
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
 
@@ -172,7 +178,7 @@ export default {
       //supplierApi.getList().then((response) => {
       supplierApi
         .search(this.currentPage, this.pageSize, this.searchMap)
-        .then((response) => {
+        .then(response => {
           const data = response.data.data;
           this.list = data.rows;
           this.total = data.total;
@@ -204,10 +210,10 @@ export default {
 
     //提交新增功能
     addData(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           //提交表单
-          supplierApi.add(this.pojo).then((response) => {
+          supplierApi.add(this.pojo).then(response => {
             const resp = response.data;
             if (resp.flag) {
               this.fetchData();
@@ -215,7 +221,7 @@ export default {
             } else {
               this.$message({
                 message: resp.message,
-                type: "warning",
+                type: "warning"
               });
             }
           });
@@ -230,7 +236,7 @@ export default {
       //清除原来的表单数据和校验结果
       console.log("编辑", id);
       this.handleAdd();
-      supplierApi.getById(id).then((response) => {
+      supplierApi.getById(id).then(response => {
         const resp = response.data;
         if (resp.flag) {
           this.pojo = resp.data;
@@ -238,15 +244,15 @@ export default {
           //提示获取数据失败
           this.$message({
             message: resp.message,
-            type: "warning",
+            type: "warning"
           });
         }
       });
     },
     updateData(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(valid => {
         if (valid) {
-          supplierApi.update(this.pojo).then((response) => {
+          supplierApi.update(this.pojo).then(response => {
             const resp = response.data;
             if (resp.flag) {
               //更新成功，刷新数据，关闭窗口
@@ -256,7 +262,7 @@ export default {
               //提示更新失败
               this.$message({
                 message: resp.message,
-                type: "warning",
+                type: "warning"
               });
             }
           });
@@ -271,16 +277,16 @@ export default {
       console.log("删除", id);
       this.$confirm("确定删除这条记录？", "提示", {
         confirmButtonText: "确认",
-        concleButtonText: "取消",
+        concleButtonText: "取消"
       })
         .then(() => {
-          supplierApi.deleteById(id).then((response) => {
+          supplierApi.deleteById(id).then(response => {
             const resp = response.data;
 
             //提示更新失败
             this.$message({
               message: resp.message,
-              type: resp.flag ? 'success':'error'
+              type: resp.flag ? "success" : "error"
             });
 
             if (resp.flag) {
@@ -292,7 +298,7 @@ export default {
         .catch(() => {
           //取消删除
         });
-    },
-  },
+    }
+  }
 };
 </script>

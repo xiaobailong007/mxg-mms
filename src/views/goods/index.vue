@@ -24,7 +24,9 @@
       </el-form-item>
 
       <el-form-item prop="supplierName">
-        <el-input readonly
+        <el-input
+          readonly
+          @click.native="dialogSupplierVisible = true"
           v-model="searchMap.supplierName"
           placeholder="选择供应商"
           style="width:200px"
@@ -75,25 +77,30 @@
     ></el-pagination>
 
     <!-- 选择供应商对话框 -->
-<el-dialog title="选择供应商" :visible.sync="dialogSupplierVisible" width="500px">
-<supplier></supplier>
-<el-dialog>
+    <el-dialog
+      title="选择供应商"
+      :visible.sync="dialogSupplierVisible"
+      width="500px"
+    >
+      <supplier :isDialog="true"></supplier>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import goodsApi from "@/api/goods.js";
+import goodsApi from "@/api/goods";
 import Supplier from "@/views/supplier";
 export default {
   //注册Supplier作为子组件
-  comments: { Supplier },
+  components: { Supplier },
   data() {
     return {
       list: [],
       pageSize: 10,
       currentPage: 1,
       total: 0,
-      searchMap: {}
+      searchMap: {},
+      dialogSupplierVisible: false //弹出选择供应商对话框
     };
   },
 
