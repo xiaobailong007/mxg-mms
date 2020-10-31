@@ -33,13 +33,28 @@
 
       <el-form-item>
         <el-button type="primary" @click="fetchData">查询</el-button>
-        <el-button type="primary" @click="handleAdd" v-if="!isDialog">新增</el-button>
-        <el-button @click="resetForm('searchForm')" v-if="!isDialog">重置</el-button>
+        <el-button type="primary" @click="handleAdd" v-if="!isDialog"
+          >新增</el-button
+        >
+        <el-button @click="resetForm('searchForm')" v-if="!isDialog"
+          >重置</el-button
+        >
       </el-form-item>
     </el-form>
 
-    <!-- 数据列表 -->
-    <el-table :data="list" height="380" border style="width: 100%">
+    <!-- 数据列表
+    highlight-current-row激活单选行 
+    @current-change 当点击某一行后，会触发这个事件，从而调用对应的函数handleCurrentChange
+    handleCurrentChange函数会接收两个参数
+    -->
+    <el-table
+      :highlight-current-row="isDialog"
+      @current-change="handleCurrentChange"
+      :data="list"
+      height="380"
+      border
+      style="width: 100%"
+    >
       <!-- type="index"获取索引值-->
       <el-table-column type="index" label="序号" width="60"></el-table-column>
       <el-table-column prop="name" label="供应商名称"></el-table-column>
@@ -48,8 +63,16 @@
         label="联系人"
         width="90"
       ></el-table-column>
-      <el-table-column v-if="!isDialog" prop="mobile" label="联系电话" ></el-table-column>
-      <el-table-column v-if="!isDialog" prop="remark" label="备注"></el-table-column>
+      <el-table-column
+        v-if="!isDialog"
+        prop="mobile"
+        label="联系电话"
+      ></el-table-column>
+      <el-table-column
+        v-if="!isDialog"
+        prop="remark"
+        label="备注"
+      ></el-table-column>
       <el-table-column v-if="!isDialog" label="操作" width="150">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row.id)"
@@ -67,18 +90,22 @@
 
     <!-- 分页组件 -->
     <el-pagination
-      :layout="!isDialog?'total, sizes, prev, pager, next, jumper':'prev, pager, next'"
+      :layout="
+        !isDialog
+          ? 'total, sizes, prev, pager, next, jumper'
+          : 'prev, pager, next'
+      "
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
       :page-sizes="[10, 20, 50]"
       :page-size="pageSize"
-
       :total="total"
     ></el-pagination>
 
     <!-- 弹出新增窗口 -->
     <el-dialog
+    v-if="!isDialog"
       title="供应商编辑"
       :visible.sync="dialogFormVisible"
       width="500px"
@@ -127,7 +154,7 @@ export default {
   props: {
     //接受父组件传递过来得数据,通过isDialog来判断是否为弹框
     //如果为true，则是弹框，false就是列表
-    isDialog:Boolean
+    isDialog: Boolean
   },
   data() {
     return {
@@ -298,6 +325,14 @@ export default {
         .catch(() => {
           //取消删除
         });
+    },
+    //当点击某一行时，会调用这个函数进行处理
+    handleCurrentChange(rurrentRow) {
+      // alert("hello");
+      //点击后，要将点击的数据传递到父组件（商品管理中），
+      //则可以通过触发父组件的option-supplier，触发之后
+      //父组件可以在option-supplier这个事件对应的处理函数种进行接受数据
+      this.$emit('option-supplier',rurrentRow)
     }
   }
 };
