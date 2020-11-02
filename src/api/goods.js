@@ -10,6 +10,14 @@ export default {
             method:'post',
             data:searchMap
         })
+    },
+
+    add(pojo){
+        return request({
+            url: `/goods`,
+            method:'post',
+            data:pojo
+        })
     }
 
 }
