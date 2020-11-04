@@ -116,8 +116,8 @@
           <el-input v-model="pojo.retailPrice"></el-input>
         </el-form-item>
 
-        <el-form-item label="进货价" prop="retailPrice">
-          <el-input v-model="pojo.retailPrice"></el-input>
+        <el-form-item label="进货价" prop="purchasePrice">
+          <el-input v-model="pojo.purchasePrice"></el-input>
         </el-form-item>
 
         <el-form-item label="库存数量" prop="storageNum">
@@ -135,9 +135,16 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="pojo.id === addData('pojoForm')"
+        <el-button
+          type="primary"
+          @click="
+            pojo.id === null ? addData('pojoForm') : updateDate('pojoForm')
+          "
+          >确 定</el-button
+        >
+        <!-- <el-button type="primary" @click="pojo.id === addData('pojoForm')"
           >确 定
-        </el-button>
+        </el-button> -->
       </div>
     </el-dialog>
   </div>
@@ -186,11 +193,12 @@ export default {
         ]
       },
       pojo: {
+        id: null,
         name: "",
         code: "",
         spec: "",
         retailPrice: 0.0,
-        purchaesPrice: 0.0,
+        purchasePrice: 0.0,
         storageNum: 0,
         supplierName: "",
         supplierId: null
@@ -250,6 +258,7 @@ export default {
 
     //提交新增功能
     addData(formName) {
+      console.log(1);
       this.$refs[formName].validate(valid => {
         if (valid) {
           //提交表单
@@ -274,6 +283,69 @@ export default {
     editOptionSupplier() {
       (this.isEdit = true), //当前是通过编辑窗口中的选择供应商打开的窗口
         (this.dialogSupplierVisible = true);
+    },
+
+    //打开编辑窗口
+    handleEdit(id) {
+      this.handleAdd();
+      goodsApi.getById(id).then(response => {
+        const resp = response.data;
+        if (resp.flag) {
+          this.pojo = resp.data;
+        }
+      });
+    },
+
+    //提交更新的数据
+    updateDate(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          //校验通过
+          goodsApi.update(this.pojo).then(response => {
+            const resp = response.data;
+            if (resp.flag) {
+              //修改成功，刷新数据，关闭窗口
+              this.fetchData();
+              this.dialogFormVisible = false;
+            }
+          });
+        } else {
+          //页面没有校验通过
+          this.$message({
+            message: resp.message,
+            type: "warning"
+          });
+        }
+      });
+    },
+
+
+    //删除
+    handleDelete(id) {
+      console.log("删除", id);
+      this.$confirm("确定删除这条记录？", "提示", {
+        confirmButtonText: "确认",
+        concleButtonText: "取消"
+      })
+        .then(() => {
+          goodsApi.deleteById(id).then(response => {
+            const resp = response.data;
+
+            //提示更新失败
+            this.$message({
+              message: resp.message,
+              type: resp.flag ? "success" : "error"
+            });
+
+            if (resp.flag) {
+              //删除成功,刷新数据
+              this.fetchData();
+            }
+          });
+        })
+        .catch(() => {
+          //取消删除
+        });
     }
   }
 };

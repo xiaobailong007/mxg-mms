@@ -44,12 +44,12 @@
 
     <!-- 数据列表
     highlight-current-row激活单选行 
-    @current-change 当点击某一行后，会触发这个事件，从而调用对应的函数handleCurrentChange
-    handleCurrentChange函数会接收两个参数
+    @current-change 当点击某一行后，会触发这个事件，从而调用对应的函数clickCurrentChange
+   clickCurrentChange函数会接收两个参数
     -->
     <el-table
       :highlight-current-row="isDialog"
-      @current-change="handleCurrentChange"
+      @current-change="clickCurrentChange"
       :data="list"
       height="380"
       border
@@ -105,7 +105,7 @@
 
     <!-- 弹出新增窗口 -->
     <el-dialog
-    v-if="!isDialog"
+      v-if="!isDialog"
       title="供应商编辑"
       :visible.sync="dialogFormVisible"
       width="500px"
@@ -213,10 +213,13 @@ export default {
         });
     },
 
+    //当每页显示条数改变后，进行调用该方法，val是当前改变后条数
     handleSizeChange(val) {
       this.pageSize = val;
       this.fetchData();
     },
+
+    //当页码改变之后，会进行调用
     handleCurrentChange(val) {
       this.currentPage = val;
       this.fetchData();
@@ -327,12 +330,12 @@ export default {
         });
     },
     //当点击某一行时，会调用这个函数进行处理
-    handleCurrentChange(rurrentRow) {
+    clickCurrentChange(rurrentRow) {
       // alert("hello");
       //点击后，要将点击的数据传递到父组件（商品管理中），
       //则可以通过触发父组件的option-supplier，触发之后
       //父组件可以在option-supplier这个事件对应的处理函数种进行接受数据
-      this.$emit('option-supplier',rurrentRow)
+      this.$emit("option-supplier", rurrentRow);
     }
   }
 };
